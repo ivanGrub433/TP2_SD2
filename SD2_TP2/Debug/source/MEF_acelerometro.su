@@ -1,0 +1,3 @@
+../source/MEF_acelerometro.c:35:13:MEF_acelerometro_init	8	static
+../source/MEF_acelerometro.c:43:13:MEF_acelerometro	8	static
+../source/MEF_acelerometro.c:141:6:MEF_acelerometro_task_1ms	8	static

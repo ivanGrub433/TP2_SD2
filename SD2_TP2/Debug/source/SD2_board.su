@@ -1,0 +1,9 @@
+C:\Users\Javier\Documents\MCUXpressoIDE_25.6.136\workspace\SD2_TP2\drivers/fsl_clock.h:437:20:CLOCK_EnableClock	24	static
+C:\Users\Javier\Documents\MCUXpressoIDE_25.6.136\workspace\SD2_TP2\drivers/fsl_port.h:360:20:PORT_SetPinConfig	32	static
+C:\Users\Javier\Documents\MCUXpressoIDE_25.6.136\workspace\SD2_TP2\drivers/fsl_gpio.h:374:20:GPIO_PortSet	16	static
+C:\Users\Javier\Documents\MCUXpressoIDE_25.6.136\workspace\SD2_TP2\drivers/fsl_gpio.h:389:20:GPIO_PortClear	16	static
+C:\Users\Javier\Documents\MCUXpressoIDE_25.6.136\workspace\SD2_TP2\drivers/fsl_gpio.h:404:20:GPIO_PortToggle	16	static
+C:\Users\Javier\Documents\MCUXpressoIDE_25.6.136\workspace\SD2_TP2\drivers/fsl_gpio.h:427:24:GPIO_PinRead	16	static
+../source/SD2_board.c:71:6:board_init	32	static
+../source/SD2_board.c:132:6:board_setLed	16	static
+../source/SD2_board.c:153:6:board_getSw	16	static

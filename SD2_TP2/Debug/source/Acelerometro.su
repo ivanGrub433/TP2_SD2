@@ -1,0 +1,8 @@
+../source/Acelerometro.c:39:6:Acelerometro_set_max_acc2	16	static
+../source/Acelerometro.c:46:9:Acelerometro_get_max_acc2	8	static
+../source/Acelerometro.c:53:6:Acelerometro_evaluate_max_acc2	16	static
+../source/Acelerometro.c:70:6:Acelerometro_set_freefall_en	24	static
+../source/Acelerometro.c:94:6:fxls8974_enable_freefall	40	static
+../source/Acelerometro.c:149:6:fxls8974_disable_freefall	32	static
+../source/Acelerometro.c:180:6:Acelerometro_get_freefall_status	24	static
+../source/Acelerometro.c:202:6:Acelerometro_set_freefall_status	16	static
