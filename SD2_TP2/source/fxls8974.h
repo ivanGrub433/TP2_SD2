@@ -77,7 +77,7 @@ typedef enum
  **/
 void fxls8974_init(void);
 //void fxls8974_Bajo_Consumo(void);
-uint16_t Obtener_Valor(void);
+float Obtener_Valor(void);
 bool fxls8974_freefall_detectado(void);
 
 

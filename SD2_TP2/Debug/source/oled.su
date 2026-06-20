@@ -1,0 +1,17 @@
+../source/oled.c:106:1:writeCommand	16	static
+../source/oled.c:122:1:writeData	16	static
+../source/oled.c:139:1:writeDataLen	160	static
+../source/oled.c:161:1:runInitSequence	8	static
+../source/oled.c:208:13:hLine	32	static
+../source/oled.c:238:13:vLine	32	static
+../source/oled.c:268:6:oled_init	16	static
+../source/oled.c:295:6:oled_setContrast	16	static
+../source/oled.c:311:6:oled_putPixel	48	static
+../source/oled.c:372:6:oled_line	40	static
+../source/oled.c:475:6:oled_circle	64	static
+../source/oled.c:613:6:oled_rect	24	static
+../source/oled.c:634:6:oled_fillRect	32	static
+../source/oled.c:681:6:oled_clearScreen	32	static
+../source/oled.c:698:9:oled_putChar	32	static
+../source/oled.c:738:6:oled_putString	32	static
+../source/oled.c:756:6:oled_inform_max_acc	72	static

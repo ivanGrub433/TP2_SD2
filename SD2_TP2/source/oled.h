@@ -73,7 +73,7 @@ uint8_t oled_putChar(uint8_t x, uint8_t y, uint8_t ch, oled_color_t fb, oled_col
 void oled_setContrast(uint8_t contrast);
 
 void oled_stand_by(void);
-void oled_inform_max_acc(int16_t max_acc);
+void oled_inform_max_acc(float max_acc);
 
 /*==================[cplusplus]==============================================*/
 #ifdef __cplusplus

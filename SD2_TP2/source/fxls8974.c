@@ -38,6 +38,8 @@
 #include "fsl_port.h"
 #include "fsl_gpio.h"
 #include "fsl_clock.h"
+#include "power_mode_switch.h"
+#include <math.h>
 
 /*==================[macros and definitions]=================================*/
 
@@ -114,7 +116,7 @@
 
 #define FXLS8974_SELF_TEST_CONFIG1_REG 0x37 // Self-test idle duration
 #define FXLS8974_SELF_TEST_CONFIG2_REG 0x38 // Self-test measurement decimation
-
+float valor_prueba;
 typedef union {
     struct {
         unsigned SRC_BOOT   : 1;  // bit 0
@@ -488,7 +490,7 @@ void fxls8974_init(void)
 
     // Config register 5
     sens_config_5_reg.data = 0;
-    sens_config_5_reg.bits.VECM_EN = 0;
+    sens_config_5_reg.bits.VECM_EN = 1;
     fxls8974_write_reg(FXLS8974_SENS_CONFIG5_REG, sens_config_5_reg.data);
 
 
@@ -645,50 +647,97 @@ void fxls8974_init(void)
 //}
 
 //Calculo de la aceleracion
-uint16_t Obtener_Valor(void)
+float Obtener_Valor(void)
 {
-    SENS_CONFIG1_t sens_config1_reg;
+    uint8_t x_lsb, x_msb;
+    uint8_t y_lsb, y_msb;
+    uint8_t z_lsb, z_msb;
 
-    uint16_t vector_raw;
+    int16_t raw_x, raw_y, raw_z;
 
-    float aceleracion_g = 0.0f;
+    float ax_g, ay_g, az_g;
+    float aceleracion_g;
+
+    x_lsb = fxls8974_read_reg(FXLS8974_OUT_X_LSB_REG);
+    x_msb = fxls8974_read_reg(FXLS8974_OUT_X_MSB_REG);
+
+    y_lsb = fxls8974_read_reg(FXLS8974_OUT_Y_LSB_REG);
+    y_msb = fxls8974_read_reg(FXLS8974_OUT_Y_MSB_REG);
+
+    z_lsb = fxls8974_read_reg(FXLS8974_OUT_Z_LSB_REG);
+    z_msb = fxls8974_read_reg(FXLS8974_OUT_Z_MSB_REG);
+
+    raw_x = (int16_t)((x_msb << 8) | x_lsb);
+    raw_y = (int16_t)((y_msb << 8) | y_lsb);
+    raw_z = (int16_t)((z_msb << 8) | z_lsb);
 
     /*
-     * Leo parte alta y baja del vector magnitude
+     * FXLS8974 entrega datos de 12 bits alineados a izquierda.
+     * Por eso se desplaza 4 bits.
      */
-    vector_raw =
-        (fxls8974_read_reg(FXLS8974_VECM_MSB_REG) << 8) |
-         fxls8974_read_reg(FXLS8974_VECM_LSB_REG);
+    raw_x >>= 4;
+    raw_y >>= 4;
+    raw_z >>= 4;
 
     /*
-     * Leo el FSR configurado
+     * Si FSR = +-4g:
+     * 1 LSB ≈ 0.00195 g
      */
-    sens_config1_reg.data = fxls8974_read_reg(FXLS8974_SENS_CONFIG1_REG);
+    ax_g = raw_x * 0.00195f;
+    ay_g = raw_y * 0.00195f;
+    az_g = raw_z * 0.00195f;
 
-    /*
-     * Conversión a g según el rango configurado
-     */
-    switch(sens_config1_reg.bits.FSR)
-    {
-        case 0b00:    /* +-2g */
-            aceleracion_g = vector_raw * 0.00098f;
-        break;
-
-        case 0b01:    /* +-4g */
-            aceleracion_g = vector_raw * 0.00195f;
-        break;
-
-        case 0b10:    /* +-8g */
-            aceleracion_g = vector_raw * 0.0039f;
-        break;
-
-        case 0b11:    /* +-16g */
-            aceleracion_g = vector_raw * 0.00781f;
-        break;
-    }
+    aceleracion_g = sqrtf((ax_g * ax_g) +
+                          (ay_g * ay_g) +
+                          (az_g * az_g));
 
     return aceleracion_g;
 }
+//float Obtener_Valor(void)
+//{
+//    SENS_CONFIG1_t sens_config1_reg;
+//
+//    uint16_t vector_raw;
+//
+//    float aceleracion_g = 0.0f;
+//
+//    /*
+//     * Leo parte alta y baja del vector magnitude
+//     */
+//
+//        (fxls8974_read_reg(FXLS8974_VECM_MSB_REG) << 8) |
+//         fxls8974_read_reg(FXLS8974_VECM_LSB_REG);
+//    valor_prueba=
+//    /*
+//     * Leo el FSR configurado
+//     */
+//    sens_config1_reg.data = fxls8974_read_reg(FXLS8974_SENS_CONFIG1_REG);
+//
+//    /*
+//     * Conversión a g según el rango configurado
+//     */
+//    switch(sens_config1_reg.bits.FSR)
+//    {
+//        case 0b00:    /* +-2g */
+//            aceleracion_g = vector_raw * 0.00098f;
+//        break;
+//
+//        case 0b01:    /* +-4g */
+//            aceleracion_g = vector_raw * 0.00195f;
+//        break;
+//
+//        case 0b10:    /* +-8g */
+//            aceleracion_g = vector_raw * 0.0039f;
+//        break;
+//
+//        case 0b11:    /* +-16g */
+//            aceleracion_g = vector_raw * 0.00781f;
+//        break;
+//    }
+//    vector_raw =aceleracion_g;
+//
+//    return aceleracion_g;
+//}
 
 
 // Funcion que no uso
@@ -762,7 +811,6 @@ void PORTC_PORTD_IRQHandler(void)
         booted = true;
 
     }
-
     PORT_ClearPinsInterruptFlags(INT1_PORT, 1 << INT1_PIN);
 }
 

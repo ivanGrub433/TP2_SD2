@@ -46,9 +46,11 @@
 #include "font5x7.h"
 #include "SD2_board.h"
 
+
 /******************************************************************************
  * Defines and typedefs
  *****************************************************************************/
+
 #define OLED_DATA()   board_setOledPin(OLED_DATA_CMD_PIN, 1)
 #define OLED_CMD()    board_setOledPin(OLED_DATA_CMD_PIN, 0)
 
@@ -84,16 +86,8 @@
  */
 static uint8_t shadowFB[SHADOW_FB_SIZE];
 
-static uint8_t const  font_mask[8] = {
-		0x80,
-		0x40,
-		0x20,
-		0x10,
-		0x08,
-		0x04,
-		0x02,
-		0x01
-};
+static uint8_t const  font_mask[8] = {0x80, 0x40, 0x20, 0x10, 0x08, 0x04, 0x02, 0x01};
+
 
 /******************************************************************************
  * Local Functions
@@ -108,7 +102,9 @@ static uint8_t const  font_mask[8] = {
  *   [in] data - command to write to the display
  *
  *****************************************************************************/
-static void writeCommand(uint8_t data) {
+static void
+writeCommand(uint8_t data)
+{
 	OLED_CMD();
 	board_SPISend(&data, 1);
 }
@@ -122,7 +118,9 @@ static void writeCommand(uint8_t data) {
  *   [in] data - data (color) to write to the display
  *
  *****************************************************************************/
-static void writeData(uint8_t data) {
+static void
+writeData(uint8_t data)
+{
     OLED_DATA();
 	board_SPISend(&data, 1);
 }
@@ -137,7 +135,9 @@ static void writeData(uint8_t data) {
  *   [in] len  - number of bytes to write
  *
  *****************************************************************************/
-static void writeDataLen(unsigned char data, unsigned int len) {
+static void
+writeDataLen(unsigned char data, unsigned int len)
+{
 	int i;
     uint8_t buf[140];
 
@@ -150,13 +150,16 @@ static void writeDataLen(unsigned char data, unsigned int len) {
     board_SPISend(buf, len);
 }
 
+
 /******************************************************************************
  *
  * Description:
  *    Run display init sequence
  *
  *****************************************************************************/
-static void runInitSequence() {
+static void
+runInitSequence()
+{
     /*
      * Values extracted from Adafruit library (https://github.com/adafruit/Adafruit_SSD1306)
      */
@@ -189,6 +192,7 @@ static void runInitSequence() {
 	 writeCommand(0xAF);
 }
 
+
 /******************************************************************************
  *
  * Description:
@@ -201,16 +205,19 @@ static void runInitSequence() {
  *   [in] color - color of the pixel
  *
  *****************************************************************************/
-static void hLine(uint8_t x0, uint8_t y0, uint8_t x1, oled_color_t color) {
+static void hLine(uint8_t x0, uint8_t y0, uint8_t x1, oled_color_t color)
+{
     uint8_t bak;
 
-    if (x0 > x1) {
+    if (x0 > x1)
+    {
         bak = x1;
         x1 = x0;
         x0 = bak;
     }
 
-    while(x1 >= x0) {
+    while(x1 >= x0)
+    {
         oled_putPixel(x0, y0, color);
         x0++;
     }
@@ -228,21 +235,25 @@ static void hLine(uint8_t x0, uint8_t y0, uint8_t x1, oled_color_t color) {
  *   [in] color - color of the pixel
  *
  *****************************************************************************/
-static void vLine(uint8_t x0, uint8_t y0, uint8_t y1, oled_color_t color) {
+static void vLine(uint8_t x0, uint8_t y0, uint8_t y1, oled_color_t color)
+{
     uint8_t bak;
 
-    if(y0 > y1) {
+    if(y0 > y1)
+    {
         bak = y1;
         y1 = y0;
         y0 = bak;
     }
 
-    while(y1 >= y0) {
+    while(y1 >= y0)
+    {
         oled_putPixel(x0, y0, color);
         y0++;
     }
     return;
 }
+
 
 /******************************************************************************
  * Public Functions
@@ -254,7 +265,8 @@ static void vLine(uint8_t x0, uint8_t y0, uint8_t y1, oled_color_t color) {
  *    Initialize the OLED Display
  *
  *****************************************************************************/
-void oled_init (void) {
+void oled_init (void)
+{
     int i = 0;
 
     /* make sure power is off */
@@ -280,7 +292,7 @@ void oled_init (void) {
  * 	 [in] contrast - display contrast (0-255)
  *****************************************************************************/
 
-void oled_setContrast(uint8_t contrast) {
+void oled_setContrast(uint8_t contrast){
 	writeCommand(0x81);
 	writeCommand(contrast);
 }
@@ -357,8 +369,8 @@ void oled_putPixel(uint8_t x, uint8_t y, oled_color_t color) {
  *   [in] color - color of the line
  *
  *****************************************************************************/
-void oled_line(uint8_t x0, uint8_t y0, uint8_t x1, uint8_t y1,
-		oled_color_t color) {
+void oled_line(uint8_t x0, uint8_t y0, uint8_t x1, uint8_t y1, oled_color_t color)
+{
     int16_t   dx = 0, dy = 0;
     int8_t    dx_sym = 0, dy_sym = 0;
     int16_t   dx_x2 = 0, dy_x2 = 0;
@@ -368,30 +380,35 @@ void oled_line(uint8_t x0, uint8_t y0, uint8_t x1, uint8_t y1,
     dy = y1-y0;
 
 
-    if(dx == 0) {           /* vertical line */
-
+    if(dx == 0)           /* vertical line */
+    {
         vLine(x0, y0, y1, color);
         return;
     }
 
-    if(dx > 0) {
+    if(dx > 0)
+    {
         dx_sym = 1;
     }
-    else {
+    else
+    {
         dx_sym = -1;
     }
 
 
-    if(dy == 0) {          /* horizontal line */
+    if(dy == 0)           /* horizontal line */
+    {
         hLine(x0, y0, x1, color);
         return;
     }
 
 
-    if(dy > 0) {
+    if(dy > 0)
+    {
         dy_sym = 1;
     }
-    else {
+    else
+    {
         dy_sym = -1;
     }
 
@@ -401,31 +418,39 @@ void oled_line(uint8_t x0, uint8_t y0, uint8_t x1, uint8_t y1,
     dx_x2 = dx*2;
     dy_x2 = dy*2;
 
-    if(dx >= dy) {
+    if(dx >= dy)
+    {
         di = dy_x2 - dx;
-        while(x0 != x1) {
+        while(x0 != x1)
+        {
 
             oled_putPixel(x0, y0, color);
             x0 += dx_sym;
-            if(di<0) {
+            if(di<0)
+            {
                 di += dy_x2;
             }
-            else {
+            else
+            {
                 di += dy_x2 - dx_x2;
                 y0 += dy_sym;
             }
         }
         oled_putPixel(x0, y0, color);
     }
-    else {
+    else
+    {
         di = dx_x2 - dy;
-        while(y0 != y1) {
+        while(y0 != y1)
+        {
             oled_putPixel(x0, y0, color);
             y0 += dy_sym;
-            if(di < 0) {
+            if(di < 0)
+            {
                 di += dx_x2;
             }
-            else {
+            else
+            {
                 di += dx_x2 - dy_x2;
                 x0 += dx_sym;
             }
@@ -447,7 +472,8 @@ void oled_line(uint8_t x0, uint8_t y0, uint8_t x1, uint8_t y1,
  *   [in] color - color of the circle
  *
  *****************************************************************************/
-void oled_circle(uint8_t x0, uint8_t y0, uint8_t r, oled_color_t color) {
+void oled_circle(uint8_t x0, uint8_t y0, uint8_t r, oled_color_t color)
+{
     int16_t draw_x0, draw_y0;
     int16_t draw_x1, draw_y1;
     int16_t draw_x2, draw_y2;
@@ -727,13 +753,15 @@ void oled_putString(uint8_t x, uint8_t y, uint8_t *pStr, oled_color_t fb,
   return;
 }
 
-void oled_inform_max_acc(int16_t max_acc) {
-	uint8_t str [60];
+void oled_inform_max_acc(float max_acc) {
+	//max_acc = 1.23f;
+	uint8_t str[32]; // 60 es mucho para una sola línea, con 32 sobra.
+	// Extraemos parte entera y decimal (2 dígitos)
+	    int entero = (int)max_acc;
+	    int decimal = (int)((max_acc - entero) * 100);
+	    if(decimal < 0) decimal *= -1; // Manejo de valores negativos
 
-	oled_putString(4, 2, (uint8_t*)"SD2 TP2 Acelerometro ", OLED_COLOR_WHITE,
-			OLED_COLOR_BLACK);
-
-	sprintf((char*)str,"Max. Acc.: %4d cg", max_acc);
-	oled_putString(4, 40, str, OLED_COLOR_WHITE, OLED_COLOR_BLACK);
+	    sprintf((char*)str, "Max. Acc.: %d.%02d g", entero, decimal);
+	    oled_putString(4, 40, str, OLED_COLOR_WHITE, OLED_COLOR_BLACK);
 }
 

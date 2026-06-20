@@ -3,6 +3,7 @@
 #include "SD2_board.h"
 #include <math.h>
 #include "MEF_acelerometro.h"
+#include "power_mode_switch.h"
 #include "key.h"
 #include "fxls8974.h"
 #include "fsl_smc.h"
@@ -26,6 +27,7 @@ typedef enum {
 static EST_MEF_acelerometro_enum EST_MEF_acelerometro;
 static int32_t count_1ms_blink;
 static int32_t count_1ms_informando;
+
 volatile float aceleracion_actual= 0.0f,aceleracion_maxima= 0.0f;
 
 
@@ -34,9 +36,16 @@ volatile float aceleracion_actual= 0.0f,aceleracion_maxima= 0.0f;
 
 extern void MEF_acelerometro_init(){
 
+	/* Al iniciar el sistema comienza en el modo de reposo */
 	EST_MEF_acelerometro = EST_reposo;
 
+	/* Seteo el estado de caida como falso */
+	/* Seteo la aceleracion maxima inicial */
 	fxls8974_init();
+	/* Inicio el clock en modo bajo consumo */
+	//APP_SetClockVlpr();
+    /* Show power mode on console */
+    //APP_ShowPowerMode(SMC_GetPowerModeState(SMC));
 
 }
 
@@ -49,17 +58,17 @@ extern void MEF_acelerometro(){
 		case EST_reposo:
 
 			//__WFI();   // Duerme el micro hasta que llegue una interrupción
-
+			oled_putString(4, 2, (uint8_t*)"SD2 TP2 Gruboy-Rodrigez", OLED_COLOR_WHITE,OLED_COLOR_BLACK);
 			if(fxls8974_freefall_detectado()) {
 				/* Enciendo el led rojo */
 				board_setLed(BOARD_LED_ID_ROJO, BOARD_LED_MSG_ON);
-
+				oled_clearScreen(OLED_COLOR_BLACK);
 	    		/* Seteo el periodo del blink */
 	    		count_1ms_blink = BLINK_PERIOD_MS;
 
 				/* Transicion al estado EST_cayendo */
 				EST_MEF_acelerometro = EST_cayendo;
-
+				APP_SetClockRunFromVlpr();
 				aceleracion_maxima = 0.0f;
 			}
 
@@ -74,6 +83,7 @@ extern void MEF_acelerometro(){
 		    if(aceleracion_actual > aceleracion_maxima)
 		    {
 		        aceleracion_maxima = aceleracion_actual;
+
 		    }
 
 			/* Toglge del led para indicar caida */
@@ -118,19 +128,16 @@ extern void MEF_acelerometro(){
 
 
 			/* Muestro la maxima aceleracion en el display*/
-//			oled_inform_max_acc(sqrt(mma8451_get_max_acc2()));
+			oled_inform_max_acc(aceleracion_maxima);
 
 			if(key_getPressEv(BOARD_SW_ID_2) || !count_1ms_informando) {
 				/* Transiciono al estado EST_reposo */
 				EST_MEF_acelerometro = EST_reposo;
-
+				APP_SetClockVlpr();
+				/* Limpio la pantalla */
+				oled_clearScreen(OLED_COLOR_BLACK);
 				/* Apago el led rojo */
 				board_setLed(BOARD_LED_ID_ROJO, BOARD_LED_MSG_OFF);
-
-				board_setLed(BOARD_LED_ID_VERDE, BOARD_LED_MSG_OFF);
-
-				/* Seteo la aceleracion maxima inicial */
-				//Acelerometro_set_max_acc2(MAX_ACC2_INIT);
 
 			}
 
